@@ -20,9 +20,20 @@ License:	LGPLv2+
 Group:		System/Libraries
 Url:		https://www.lysator.liu.se/~nisse/nettle/
 Source0:	https://ftp.gnu.org/gnu/nettle/nettle-%{version}.tar.gz
-BuildRequires:	make
-BuildRequires:	m4
-BuildRequires:	slibtool
+BuildSystem:	autotools
+BuildOption:	--disable-documentation
+BuildOption:	--disable-openssl
+BuildOption:	--enable-shared
+%ifarch %{arm} %{aarch64}
+BuildOption:	--enable-arm-neon
+%endif
+%ifarch %{x86_64}
+BuildOption:	--enable-x86-aesni
+BuildOption:	--disable-x86-sha-ni
+%ifnarch znver1
+BuildOption:	--enable-fat
+%endif
+%endif
 BuildRequires:	gmp-devel
 %if %{with compat32}
 BuildRequires:	devel(libgmp)
@@ -98,59 +109,12 @@ Group:		System/Libraries
 # Disable -ggdb3 which makes debugedit unhappy
 sed s/ggdb3/g/ -i configure
 
-%build
-%if %{with compat32}
-mkdir build32
-cd build32
-# mini-gmp: 32-bit "make check" fails against system gmp (same as nettle)
-%configure32 \
-	--disable-static \
-	--disable-documentation \
-	--disable-openssl \
-	--enable-shared \
-	--enable-x86-aesni \
-	--enable-mini-gmp \
-%ifnarch znver1
-	--enable-fat \
-%endif
-	--enable-shared
-%make_build
-cd ..
-%endif
-
-mkdir build
-cd build
-%configure \
-	--disable-static \
-	--disable-documentation \
-	--disable-openssl \
-%ifarch %{arm} %{aarch64}
-	--enable-arm-neon \
-%endif
-%ifarch %{x86_64}
-	--enable-x86-aesni \
-	--disable-x86-sha-ni \
-%ifnarch znver1
-	--enable-fat \
-%endif
-%endif
-	--enable-shared
-%make_build
-
 %if ! %{cross_compiling}
 %check
-%if %{with compat32}
-%make_build check -C build32
-%endif
-%make_build check -C build
+%make_build check -C _OMV_rpm_build
 %endif
 
-%install
-%if %{with compat32}
-%make_install -C build32
-%endif
-%make_install -C build
-
+%install -a
 # runtime sonames only — do not compete with nettle 4
 rm -rf \
 	%{buildroot}%{_bindir} \
