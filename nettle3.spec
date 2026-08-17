@@ -21,6 +21,7 @@ Group:		System/Libraries
 Url:		https://www.lysator.liu.se/~nisse/nettle/
 Source0:	https://ftp.gnu.org/gnu/nettle/nettle-%{version}.tar.gz
 BuildRequires:	make
+BuildRequires:	m4
 BuildRequires:	slibtool
 BuildRequires:	gmp-devel
 %if %{with compat32}
