@@ -98,6 +98,7 @@ Group:		System/Libraries
 sed s/ggdb3/g/ -i configure
 
 %build
+export CONFIGURE_TOP="$(pwd)"
 %if %{with compat32}
 mkdir build32
 cd build32
