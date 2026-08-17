@@ -12,6 +12,7 @@
 
 Summary:	Nettle 3.x cryptographic library (runtime compat)
 Name:		nettle3
+Epoch:		1
 Version:	3.10.2
 Release:	1
 License:	LGPLv2+
